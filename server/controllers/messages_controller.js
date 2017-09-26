@@ -4,9 +4,15 @@ let id = 0;
 module.exports = {
   create: ( req, res ) => {
     const { text, time } = req.body;
-    messages.push({ id, text, time });
+    const message = {id, text, time}
+    messages.push(message);
+    req.session.user.messages.push(message)
     id++;
     res.status(200).send( messages );
+  },
+
+  history: (req, res) => {
+     res.send(req.session.user.messages)
   },
 
   read: ( req, res ) => {
@@ -15,7 +21,7 @@ module.exports = {
 
   update: ( req, res ) => {
     const { text } = req.body;
-    const updateID = req.params.id;
+    const updateID = req.query.id;
     const messageIndex = messages.findIndex( message => message.id == updateID );
     let message = messages[ messageIndex ];
 
@@ -29,7 +35,7 @@ module.exports = {
   },
 
   delete: ( req, res ) => {
-    const deleteID = req.params.id;
+    const deleteID = req.query.id;
     messageIndex = messages.findIndex( message => message.id == deleteID );
     messages.splice(messageIndex, 1);
     res.status(200).send( messages );
